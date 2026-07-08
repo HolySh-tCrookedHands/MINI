@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini/screens/auth/login.dart';
+import 'package:mini/screens/main/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,16 +8,17 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  final bool isSingIn = false;
+  final bool isSingIn = true;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: isSingIn == false ? LoginScreen() : Scaffold(),
+      home: isSingIn == false ? LoginScreen() : HomeScreen(),
     );
   }
 }
