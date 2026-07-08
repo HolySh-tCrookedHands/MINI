@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini/screens/main/contact.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -76,7 +77,13 @@ class HomeScreenState extends State<HomeScreen> {
               size: sizeNavbarIcon
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ContactScreen()
+                  )
+                );
+              },
               icon: Icon(
                 Icons.people,
                 size: sizeNavbarIcon

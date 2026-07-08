@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini/screens/main/home.dart';
 
 
 class ContactScreen extends StatefulWidget {
@@ -10,6 +11,8 @@ class ContactScreen extends StatefulWidget {
 
 class ContactScreenState extends State<ContactScreen> {
   
+  double sizeNavbarIcon = 30;
+
   Widget buildHeader() {
     return SizedBox(
       height: 120,
@@ -72,6 +75,50 @@ class ContactScreenState extends State<ContactScreen> {
     return Container();
   }
 
+  Widget buildNavbar() {
+    return SizedBox(
+      height: 100,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: Colors.black
+          ),
+          borderRadius: BorderRadiusGeometry.circular(10)
+        ),
+        shadowColor: Colors.grey,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => HomeScreen()
+                  )
+                );
+              },
+              icon: Icon(
+                Icons.home,
+                size: sizeNavbarIcon
+              )
+            ),
+            Icon(
+              Icons.people,
+              size: sizeNavbarIcon
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.person,
+                size: sizeNavbarIcon
+              )
+            )
+          ]
+        ),
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +126,8 @@ class ContactScreenState extends State<ContactScreen> {
         child: Column(
           children: [
             buildHeader(),
-            Expanded(child: buildContent())
+            Expanded(child: buildContent()),
+            buildNavbar()
           ],
         )
       ),

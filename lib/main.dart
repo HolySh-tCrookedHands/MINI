@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mini/screens/auth/login.dart';
-import 'package:mini/screens/main/contact.dart';
+import 'package:mini/screens/main/home.dart';
+
 
 
 void main() {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: isSingIn == false ? LoginScreen() : ContactScreen(),
+      home: isSingIn == false ? LoginScreen() : HomeScreen(),
     );
   }
 }
