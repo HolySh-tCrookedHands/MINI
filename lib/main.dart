@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini/screens/auth/login.dart';
+import 'package:mini/screens/auth/registration.dart';
 import 'package:mini/screens/main/home.dart';
 
 
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: isSingIn == false ? LoginScreen() : HomeScreen(),
+      home: isSingIn == false ? LoginScreen() : SignUpScreen(),
     );
   }
 }
