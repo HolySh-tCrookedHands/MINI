@@ -136,10 +136,14 @@ class IndexScreenState extends State<IndexScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            buildHeader(),
+            if (_currentIndex != 2)
+              buildHeader(),
             Expanded(
               // 4. Отображаем экран, соответствующий выбранному индексу
-              child: _screens[_currentIndex], 
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _screens[_currentIndex],
+              ), 
             ),
             buildNavbar(),
           ],
