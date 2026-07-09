@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final VoidCallback onclickSwitch;
+
+  const LoginScreen({
+    super.key,
+    required this.onclickSwitch,
+  });
 
   @override
   State<StatefulWidget> createState() => LoginScreenState();
@@ -10,8 +15,7 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    return Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
@@ -80,7 +84,7 @@ class LoginScreenState extends State<LoginScreen> {
                         child: Text('Войти')
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: widget.onclickSwitch,
                         child: Text(
                           "Нет аккаунта? Не беда!\nЖми сюда чтобы зарегистрироваться!",
                           textAlign: TextAlign.center,
@@ -93,7 +97,6 @@ class LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ],
-      )
-    );
+      );
   }
 }

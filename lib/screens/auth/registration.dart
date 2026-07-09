@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  final VoidCallback onclickSwitch;
+
+  const SignUpScreen({
+    super.key,
+    required this.onclickSwitch
+  });
 
   @override
   State<StatefulWidget> createState() => SignUpScreenState();
@@ -10,8 +15,7 @@ class SignUpScreen extends StatefulWidget {
 class SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    return Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
@@ -90,6 +94,13 @@ class SignUpScreenState extends State<SignUpScreen> {
                         onPressed: () {},
                         child: Text('Зарегистрироваться')
                       ),
+                      TextButton(
+                        onPressed: widget.onclickSwitch,
+                        child: Text(
+                          "У вас есть аккаунт?\nНажми сюда",
+                          textAlign: TextAlign.center,
+                        )
+                      )
                     ],
                   ),
                 ),
@@ -97,7 +108,6 @@ class SignUpScreenState extends State<SignUpScreen> {
             ),
           ),
         ],
-      )
-    );
+      );
   }
 }
