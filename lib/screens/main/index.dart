@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini/screens/auth/account.dart';
 import 'package:mini/screens/main/contact.dart';
 import 'package:mini/screens/main/home.dart';
 
@@ -25,7 +26,7 @@ class IndexScreenState extends State<IndexScreen> {
     _screens = [
       const HomeScreen(),
       const ContactScreen(),
-      const Center(child: Text('Профиль'),)
+      const AccountScreen()
     ];
   }
 
