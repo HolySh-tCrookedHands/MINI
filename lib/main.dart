@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini/screens/auth/controlSing.dart';
-import 'package:mini/screens/main/home.dart';
+import 'package:mini/screens/main/index.dart';
 
 
 
@@ -10,7 +10,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  final bool isSingIn = false;
+  final bool isSingIn = true;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: isSingIn == false ? SingUpInScreen() : HomeScreen(),
+      home: isSingIn == false ? SingUpInScreen() : IndexScreen(),
     );
   }
 }
