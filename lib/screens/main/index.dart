@@ -140,7 +140,6 @@ class IndexScreenState extends State<IndexScreen> {
             if (_currentIndex != 2)
               buildHeader(),
             Expanded(
-              // 4. Отображаем экран, соответствующий выбранному индексу
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: _screens[_currentIndex],
