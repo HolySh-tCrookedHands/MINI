@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// 1. Исправили нейминг класса по CamelCase (было Chatitems)
 class ChatItem extends StatelessWidget {
   final String title;
   final String urlAvatar;
