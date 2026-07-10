@@ -26,6 +26,7 @@ class AccountScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             
+            
             Card(
               shape: RoundedRectangleBorder(
                 side: const BorderSide(color: Colors.black),

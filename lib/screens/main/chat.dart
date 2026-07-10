@@ -24,24 +24,27 @@ class ChatScreenState extends State<ChatScreen> {
           color: const Color.fromARGB(255, 43, 42, 42),
           border: Border(bottom: BorderSide(color: Colors.black)),
        ),
-       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundImage: NetworkImage("https://onestopsolution.org/assets/sub-cat-imgs/no-icon.jpeg"),
-            ),
-            const Text("Еблан какой-то", 
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.normal,
-              color: Colors.white,
-            ),),
-            const Icon(
-               Icons.more_horiz,
-               size: 40,
+       child: Padding(
+         padding: const EdgeInsets.symmetric(horizontal: 16),
+         child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundImage: NetworkImage("https://onestopsolution.org/assets/sub-cat-imgs/no-icon.jpeg"),
               ),
-          ],
+              const Text("Еблан какой-то", 
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.normal,
+                color: Colors.white,
+              ),),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.more_vert_sharp)
+              )
+            ],
+         ),
        ),
     ),
   );
@@ -64,6 +67,7 @@ class ChatScreenState extends State<ChatScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: TextField(
@@ -75,7 +79,10 @@ class ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ),
-          Padding(padding: EdgeInsets.only(left: 10, bottom: 10), child: Icon(Icons.send, size: 30,),),
+          IconButton(
+            onPressed: () {}, 
+            icon: Icon(Icons.send)
+          ),
         ],
       ),
     ),
