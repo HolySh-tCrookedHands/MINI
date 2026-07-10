@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mini/screens/auth/account.dart';
 import 'package:mini/screens/main/contact.dart';
 import 'package:mini/screens/main/home.dart';
+import 'package:mini/screens/main/settings.dart';
 
 class IndexScreen extends StatefulWidget  {
   const IndexScreen({super.key});
@@ -15,7 +16,7 @@ class IndexScreenState extends State<IndexScreen> {
   int _currentIndex = 0;
   late final List<Widget> _screens;
   final List<String> _titles = [
-    'Главная',
+    'Чаты',
     'Контакты',
     'Профиль',
   ];
@@ -31,51 +32,31 @@ class IndexScreenState extends State<IndexScreen> {
   }
 
 
-  Widget buildHeader() {
-    return SizedBox(
-      height: 100,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(bottom: BorderSide(color: Colors.black)),
-          borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              spreadRadius: 1,
-              blurRadius: 10,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                _titles[_currentIndex],
-                style: const TextStyle(fontSize: 25),
-              ),
-              if (_currentIndex == 0)
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.settings),
+  AppBar buildHeader() {
+    return AppBar(
+      title: Text(_titles[_currentIndex]),
+      actions: [
+        if (_currentIndex == 0)
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen()
                 )
-              else if (_currentIndex == 1)
-                IconButton(
-                  onPressed: () {
-                  },
-                  icon: const Icon(Icons.add),
-                )
-              else
-                const SizedBox(width: 48),
-            ],
+              );
+            },
+            icon: Icon(Icons.settings)
           ),
-        ),
+        if (_currentIndex == 1)
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.add)
+          ),
+      ],
+      shape: Border(
+        bottom: BorderSide(
+          color: Colors.black
+        )
       ),
     );
   }
@@ -134,11 +115,10 @@ class IndexScreenState extends State<IndexScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: _currentIndex == 2 ? AppBar() : buildHeader(),
       body: SafeArea(
         child: Column(
           children: [
-            if (_currentIndex != 2)
-              buildHeader(),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),

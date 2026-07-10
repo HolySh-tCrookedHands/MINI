@@ -4,21 +4,20 @@ class ChatItem extends StatelessWidget {
   final String title;
   final String urlAvatar;
   final bool isOnline;
+  final GestureTapCallback callback;
 
   const ChatItem({
     super.key,
     required this.title,
     required this.urlAvatar,
     required this.isOnline,
+    required this.callback
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        print("Click");
-        print(title);
-      },
+      onTap: callback,
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.transparent,
