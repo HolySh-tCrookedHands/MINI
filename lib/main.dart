@@ -10,17 +10,17 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  final bool isSingIn = true;
+  final bool isSingIn = false;
 
   @override
   Widget build(BuildContext context) {
     DynamicTheme data = DynamicTheme();
-    data.mainColor = Colors.pink;
+    data.mainColor = Colors.indigo;
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Mini',
-      theme:data.appThemeDark,
+      theme:data.appTheme,
       home: isSingIn == false ? SingUpInScreen() : IndexScreen(),
     );
   }

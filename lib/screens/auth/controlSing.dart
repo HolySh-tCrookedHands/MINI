@@ -38,10 +38,20 @@ class SingUpInScreenState extends State<SingUpInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      body: Container(
-        child: _screens[isSingUp == true ? 1 : 0],
-      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.primaryColor
+              ),
+            )
+          ),
+          _screens[isSingUp == true ? 1 : 0]
+        ],
+      )
     );
   }
 }
