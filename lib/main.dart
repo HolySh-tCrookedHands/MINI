@@ -1,26 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:mini/screens/auth/controlSing.dart';
 import 'package:mini/screens/main/index.dart';
+import 'package:mini/utils/provider/settings.dart';
 import 'package:mini/utils/theme.dart';
+import 'package:provider/provider.dart';
 
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final settingsProvider = SettingsProvider();
+  await settingsProvider.loadSettings();
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => settingsProvider,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  final bool isSingIn = false;
+  final bool isSingIn = true;
 
   @override
   Widget build(BuildContext context) {
-    DynamicTheme data = DynamicTheme();
-    data.mainColor = Colors.indigo;
-
+    final settings = context.watch<SettingsProvider>();
+  
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Mini',
-      theme:data.appTheme,
+      themeMode: settings.theme.mode,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: settings.color.color,
+          brightness: Brightness.light,
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: settings.color.color,
+          brightness: Brightness.dark,
+        ),
+      ),
       home: isSingIn == false ? SingUpInScreen() : IndexScreen(),
     );
   }

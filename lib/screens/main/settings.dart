@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mini/utils/provider/settings.dart';
+import 'package:provider/provider.dart';
+import 'package:mini/models/appThemeModel.dart'; 
 import 'package:mini/models/appSecurityType.dart';
-import 'package:mini/models/appThemeModel.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,16 +14,17 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class SettingsScreenState extends State<SettingsScreen> {
-  AppThemeMode _selectedTheme = AppThemeMode.light;
-  AppSeedColor _selectedColor = AppSeedColor.purple;
-  AppTextSize _selectedTextSize = AppTextSize.medium;
-  String? _wallpaperPath; 
-  
-  AppSecurityType _selectedSecurityType = AppSecurityType.e2ee;
-  bool _useVpnTunnel = true;
+  final ImagePicker _picker = ImagePicker();
   final TextEditingController _serverUrlController = TextEditingController();
 
-  final ImagePicker _picker = ImagePicker();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final settings = context.read<SettingsProvider>();
+      _serverUrlController.text = settings.serverUrl;
+    });
+  }
 
   @override
   void dispose() {
@@ -29,26 +32,18 @@ class SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
-  Future<void> _pickWallpaper() async {
+  Future<void> _pickWallpaper(SettingsProvider provider) async {
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 85,
     );
 
     if (pickedFile != null) {
-      setState(() {
-        _wallpaperPath = pickedFile.path;
-      });
+      await provider.setWallpaper(pickedFile.path);
     }
   }
 
-  void _clearWallpaper() {
-    setState(() {
-      _wallpaperPath = null;
-    });
-  }
-
-
+  // Функция генерации элементов выпадающего списка
   List<DropdownMenuItem<T>> buildDropdownItems<T>(
     List<T> values, 
     String Function(T) getLabel, 
@@ -77,6 +72,9 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<SettingsProvider>();
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Настройки"),
@@ -97,31 +95,15 @@ class SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 5),
               const Divider(),
               const SizedBox(height: 10),
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Тема", style: TextStyle(fontSize: 16)),
                   DropdownButton<AppThemeMode>(
-                    value: _selectedTheme,
+                    value: settings.theme,
                     items: buildDropdownItems(AppThemeMode.values, (t) => t.label), 
                     onChanged: (val) {
-                      if (val != null) setState(() => _selectedTheme = val);
-                    },
-                  )
-                ]
-              ),
-              const SizedBox(height: 10),
-              
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Основной цвет", style: TextStyle(fontSize: 16)),
-                  DropdownButton<AppSeedColor>(
-                    value: _selectedColor,
-                    items: buildDropdownItems(AppSeedColor.values, (c) => c.name, getColor: (c) => c.color), 
-                    onChanged: (val) {
-                      if (val != null) setState(() => _selectedColor = val);
+                      if (val != null) settings.setTheme(val);
                     },
                   )
                 ]
@@ -131,12 +113,12 @@ class SettingsScreenState extends State<SettingsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Размер шрифта", style: TextStyle(fontSize: 16)),
-                  DropdownButton<AppTextSize>(
-                    value: _selectedTextSize,
-                    items: buildDropdownItems(AppTextSize.values, (s) => s.label), 
+                  const Text("Основной цвет", style: TextStyle(fontSize: 16)),
+                  DropdownButton<AppSeedColor>(
+                    value: settings.color,
+                    items: buildDropdownItems(AppSeedColor.values, (c) => c.name, getColor: (c) => c.color), 
                     onChanged: (val) {
-                      if (val != null) setState(() => _selectedTextSize = val);
+                      if (val != null) settings.setColor(val);
                     },
                   )
                 ]
@@ -149,13 +131,13 @@ class SettingsScreenState extends State<SettingsScreen> {
                   const Text("Обои в чате", style: TextStyle(fontSize: 16)),
                   Row(
                     children: [
-                      if (_wallpaperPath != null) ...[
+                      if (settings.wallpaperPath != null) ...[
                         GestureDetector(
-                          onTap: _pickWallpaper,
+                          onTap: () => _pickWallpaper(settings),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: Image.file(
-                              File(_wallpaperPath!),
+                              File(settings.wallpaperPath!),
                               width: 35,
                               height: 35,
                               fit: BoxFit.cover,
@@ -164,12 +146,12 @@ class SettingsScreenState extends State<SettingsScreen> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.redAccent, size: 20),
-                          onPressed: _clearWallpaper,
+                          onPressed: () => settings.setWallpaper(null),
                           tooltip: "Удалить обои",
                         ),
                       ] else ... [
                         OutlinedButton.icon(
-                          onPressed: _pickWallpaper,
+                          onPressed: () => _pickWallpaper(settings),
                           icon: const Icon(Icons.image, size: 18),
                           label: const Text("Выбрать"),
                         ),
@@ -193,6 +175,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   Expanded(
                     child: TextField(
                       controller: _serverUrlController,
+                      style: TextStyle(color: theme.colorScheme.onSurface),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: "Url сервера",
@@ -203,7 +186,10 @@ class SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(width: 10),
                   FilledButton(
                     onPressed: () {
-                      print("Сохраняем URL: ${_serverUrlController.text}");
+                      settings.setServerUrl(_serverUrlController.text);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("URL сервера успешно применен")),
+                      );
                     },
                     child: const Text("применить")
                   )
@@ -216,9 +202,9 @@ class SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   const Text("Использовать VPN тунель", style: TextStyle(fontSize: 16)),
                   Switch(
-                    value: _useVpnTunnel, 
+                    value: settings.useVpnTunnel, 
                     onChanged: (value) {
-                      setState(() => _useVpnTunnel = value);
+                      settings.setUseVpnTunnel(value);
                     }
                   )
                 ]
@@ -226,16 +212,14 @@ class SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 10),
               
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Тип шифрования", style: TextStyle(fontSize: 16)),
-                  DropdownButton<AppSecurityType>( 
-                    value: _selectedSecurityType,
+                  DropdownButton<AppSecurityType>(
+                    value: settings.securityType,
                     items: buildDropdownItems(AppSecurityType.values, (v) => v.label),
                     onChanged: (val) {
-                      if (val != null) {
-                        setState(() => _selectedSecurityType = val);
-                      }
+                      if (val != null) settings.setSecurityType(val);
                     },
                   )
                 ]

@@ -26,14 +26,3 @@ enum AppSeedColor {
   const AppSeedColor(this.name, this.color);
 }
 
-// Модель для масштаба текста в приложении
-enum AppTextSize {
-  small('Мелкий', 12.0),
-  medium('Стандартный', 16.0),
-  large('Крупный', 20.0),
-  huge('Очень крупный', 24.0);
-
-  final String label;
-  final double size; // Базовый размер для обычного текста (Body)
-  const AppTextSize(this.label, this.size);
-}
