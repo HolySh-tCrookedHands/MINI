@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mini/screens/auth/controlSing.dart';
 import 'package:mini/screens/main/index.dart';
 import 'package:mini/utils/provider/settings.dart';
-import 'package:mini/utils/theme.dart';
 import 'package:provider/provider.dart';
 
 

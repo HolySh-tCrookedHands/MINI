@@ -18,7 +18,7 @@ class ContactScreenState extends State<ContactScreen> {
         textAlign: TextAlign.center,
         decoration: const InputDecoration(
           border: OutlineInputBorder(),
-          hintText: "Поиск", // Используй hintText вместо hint: Text()
+          hintText: "Поиск",
         ),
       ),
     );
@@ -31,12 +31,11 @@ class ContactScreenState extends State<ContactScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Внимание: НИКАКИХ Scaffold, SafeArea и Navbar тут больше нет!
     return Column(
       children: [
-        buildSearchBar(), // Строка поиска
+        buildSearchBar(),
         Expanded(
-          child: buildContent(), // Сам список контактов
+          child: buildContent(),
         ),
       ],
     );

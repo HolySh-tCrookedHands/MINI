@@ -18,7 +18,6 @@ class SettingsProvider extends ChangeNotifier {
   AppSecurityType _securityType = AppSecurityType.e2ee;
 
 
-  // Геттеры для UI
   AppThemeMode get theme => _theme;
   AppSeedColor get color => _color;
   String? get wallpaperPath => _wallpaperPath;
@@ -26,15 +25,12 @@ class SettingsProvider extends ChangeNotifier {
   bool get useVpnTunnel => _useVpnTunnel;
   AppSecurityType get securityType => _securityType;
 
-  // Загрузка настроек из базы при запуске приложения
   Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Загружаем тему
     final themeIndex = prefs.getInt(_keyTheme);
     if (themeIndex != null) _theme = AppThemeMode.values[themeIndex];
 
-    // Загружаем цвет
     final colorIndex = prefs.getInt(_keyColor);
     if (colorIndex != null) _color = AppSeedColor.values[colorIndex];
 
@@ -42,14 +38,12 @@ class SettingsProvider extends ChangeNotifier {
     final secIndex = prefs.getInt('security_type');
     if (secIndex != null) _securityType = AppSecurityType.values[secIndex];
 
-    // Загружаем обои и урл
     _wallpaperPath = prefs.getString(_keyWallpaper);
     _serverUrl = prefs.getString(_keyServerUrl) ?? "";
 
-    notifyListeners(); // Обновляем все экраны после загрузки данных
+    notifyListeners();
   }
 
-  // Сеттеры с автосохранением в БД
   Future<void> setTheme(AppThemeMode newTheme) async {
     _theme = newTheme;
     notifyListeners();
