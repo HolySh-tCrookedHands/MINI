@@ -15,12 +15,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DynamicTheme data = DynamicTheme();
-    data.mainColor = Colors.blueGrey;
+    data.mainColor = Colors.pink;
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Mini',
-      theme:data.appTheme,
+      theme:data.appThemeDark,
       home: isSingIn == false ? SingUpInScreen() : IndexScreen(),
     );
   }

@@ -5,6 +5,8 @@ class AccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -17,35 +19,44 @@ class AccountScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             
-            const Text(
+            Text(
               "Артём",
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
+                // ДИНАМИЧЕСКИ: Основной цвет текста
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 30),
             
-            
             Card(
               shape: RoundedRectangleBorder(
-                side: const BorderSide(color: Colors.black),
+                side: BorderSide(
+                  color: theme.colorScheme.outlineVariant,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "о себе", 
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold, 
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                    Divider(),
-                    SizedBox(height: 5),
+                    const Divider(),
+                    const SizedBox(height: 5),
                     Text(
                       "«Судьба ведет того, кто хочет, и тащит того, кто не хочет.» — Клеанф",
-                      style: TextStyle(fontStyle: FontStyle.italic),
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
                   ],
                 ),
@@ -56,8 +67,9 @@ class AccountScreen extends StatelessWidget {
             SizedBox(
               width: 200, 
               child: FilledButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(Colors.grey),
+                style: FilledButton.styleFrom(
+                  backgroundColor: theme.colorScheme.secondaryContainer,
+                  foregroundColor: theme.colorScheme.onSecondaryContainer,
                 ),
                 onPressed: () {},
                 child: const Row(
@@ -75,8 +87,9 @@ class AccountScreen extends StatelessWidget {
             SizedBox(
               width: 200,
               child: FilledButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(Colors.red),
+                style: FilledButton.styleFrom(
+                  backgroundColor: theme.colorScheme.error,
+                  foregroundColor: theme.colorScheme.onError,
                 ),
                 onPressed: () {},
                 child: const Row(

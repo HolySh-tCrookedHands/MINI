@@ -16,12 +16,14 @@ class ChatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: callback,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.transparent,
-          border: Border(bottom: BorderSide(color: Colors.black)),
+          border: Border(bottom: BorderSide(color: theme.colorScheme.outlineVariant)),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -43,7 +45,10 @@ class ChatItem extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.green,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(
+                            color: theme.colorScheme.surface, 
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
@@ -53,9 +58,10 @@ class ChatItem extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.onSurface, 
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
