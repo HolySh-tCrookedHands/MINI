@@ -31,8 +31,8 @@ class IndexScreenState extends State<IndexScreen> {
     ];
   }
 
-
   AppBar buildHeader() {
+    final theme = Theme.of(context);
     return AppBar(
       title: Text(_titles[_currentIndex]),
       actions: [
@@ -55,55 +55,62 @@ class IndexScreenState extends State<IndexScreen> {
       ],
       shape: Border(
         bottom: BorderSide(
-          color: Colors.black
+          color: theme.colorScheme.outlineVariant
         )
       ),
     );
   }
 
   Widget buildNavbar() {
+    final theme = Theme.of(context);
+
     return SizedBox(
       height: 100,
       child: Card(
-        // Исправил BorderRadiusGeometry на BorderRadius
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: Colors.black),
+          side: BorderSide(
+            color: theme.colorScheme.outlineVariant,
+          ),
           borderRadius: BorderRadius.circular(10), 
         ),
-        shadowColor: Colors.grey,
+        shadowColor: theme.colorScheme.shadow,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Сделал первую иконку тоже кнопкой
             IconButton(
               onPressed: () {
-                setState(() => _currentIndex = 0); // Переключаем на Главную
+                setState(() => _currentIndex = 0);
               },
               icon: Icon(
                 Icons.home,
                 size: sizeNavbarIcon,
-                // Подсвечиваем активную иконку синим цветом
-                color: _currentIndex == 0 ? Colors.blue : Colors.black, 
+                color: _currentIndex == 0 
+                    ? theme.colorScheme.primary 
+                    : theme.colorScheme.onSurface, 
               ),
             ),
             IconButton(
               onPressed: () {
-                setState(() => _currentIndex = 1); // Переключаем на Контакты
+                setState(() => _currentIndex = 1);
               },
               icon: Icon(
                 Icons.people,
                 size: sizeNavbarIcon,
-                color: _currentIndex == 1 ? Colors.blue : Colors.black,
+                color: _currentIndex == 1 
+                    ? theme.colorScheme.primary 
+                    : theme.colorScheme.onSurface,
               ),
             ),
             IconButton(
               onPressed: () {
-                setState(() => _currentIndex = 2); // Переключаем на Профиль
+                setState(() => _currentIndex = 2);
               },
               icon: Icon(
                 Icons.person,
                 size: sizeNavbarIcon,
-                color: _currentIndex == 2 ? Colors.blue : Colors.black,
+                color: _currentIndex == 2 
+                    ? theme.colorScheme.primary 
+                    : theme.colorScheme.onSurface,
               ),
             ),
           ],
