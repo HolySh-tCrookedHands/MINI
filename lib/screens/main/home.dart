@@ -16,7 +16,11 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    data = [
+    data = GetChatList();
+  }
+
+  List<ChatItemModel> GetChatList() {
+    return [
       ChatItemModel(
         id:0,
         title: "Артём", 
@@ -36,10 +40,6 @@ class HomeScreenState extends State<HomeScreen> {
         isOnline: false
       ),
     ];
-  }
-
-  void GetChatList() {
-    // TODO: написать функцию запроса списка чатов к бэкенду
   }
   
   Widget buildListChat() {
