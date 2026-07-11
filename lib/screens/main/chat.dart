@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mini/models/chatItemModel.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final ChatItemModel data;
+  const ChatScreen({
+    super.key,
+    required this.data
+  });
 
   @override
   State<StatefulWidget> createState() => ChatScreenState();
@@ -16,41 +21,42 @@ class ChatMessage {
 
 class ChatScreenState extends State<ChatScreen> {
 
-  late final TextEditingController textController = TextEditingController(); 
+  late final TextEditingController msgTextController = TextEditingController(); 
 
   final List<ChatMessage> _messages = [
     ChatMessage(text: "Дарова гандон", isMe: true),
     ChatMessage(text: "Пашол нахуй", isMe: false)
   ];
 
-  Widget buildChatBar() {
-    return SizedBox(
-      height: 70,
-      child: Container(
-        decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 43, 42, 42),
-            border: Border(bottom: BorderSide(color: Colors.black)),
-        ),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage("https://onestopsolution.org/assets/sub-cat-imgs/no-icon.jpeg"),
-              ),
-              const Text("Пользователь", 
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.normal,
-                color: Colors.white,
-              ),),
-              const Icon(
-                Icons.more_horiz,
-                size: 40,
-                ),
-            ],
-        ),
+  AppBar buildChatBar() {
+    final theme = Theme.of(context);
+    return AppBar(
+      toolbarHeight: 70,
+      automaticallyImplyLeading: false,
+      leadingWidth: 100,
+      backgroundColor: theme.focusColor,
+      leading:  Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          CircleAvatar(
+            radius: 20,
+            backgroundImage: NetworkImage(widget.data.urlAvatar), // Или NetworkImage
+          ),
+        ],
       ),
+      title: Text(widget.data.title),
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: Icon(Icons.more_vert)
+        )
+      ],
     );
   }
  
@@ -86,40 +92,43 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
-
   Widget buildChatArea() {
-    return Expanded(
-      child: ListView.builder(
-        padding: const EdgeInsets.all(8.0),
-        itemCount: _messages.length,
-        itemBuilder: (context, index) {
-          return buildMessageBubble(_messages[index]);
-        },
-      ),
+    return ListView.separated(
+      separatorBuilder:(context, index) {
+        return SizedBox(height: 10,);
+      },
+      padding: const EdgeInsets.all(8.0),
+      itemCount: _messages.length,
+      itemBuilder: (context, index) {
+        return buildMessageBubble(_messages[index]);
+      },
     );
   }
 
   void sendMessage() {
-    final text = textController.text.trim();
+    final text = msgTextController.text.trim();
     if (text.isEmpty) return;
 
     setState(() {
       _messages.add(ChatMessage(text: text, isMe: true));
     });
 
-    textController.clear();
+    msgTextController.clear();
   }
+
+  void addMedia() {
+    print('Добавили медиа файл');
+  }
+
   Widget buildMessageSender() {
     return SizedBox(
-      child: Container(
-        color: Colors.blueGrey,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
               child: TextField(
-                controller: textController,
+                controller: msgTextController,
                 decoration: InputDecoration(
                 hintText: "Введите сообщение...",
                 border: OutlineInputBorder(),
@@ -128,7 +137,19 @@ class ChatScreenState extends State<ChatScreen> {
                 onSubmitted: (_) => sendMessage(),
               ),
             ),
-            Padding(padding: EdgeInsets.only(left: 10, bottom: 10), child: IconButton( onPressed: sendMessage, icon: Icon(Icons.send, size: 30,),),)
+            Padding(
+              padding: EdgeInsets.only(
+                left: 10, 
+                bottom: 10
+              ), 
+              child:IconButton(
+                onPressed:sendMessage,
+                icon: Icon(
+                  Icons.send , 
+                  size: 30,
+                ),
+              )
+            )
           ],
         ),
       ),
@@ -138,10 +159,10 @@ class ChatScreenState extends State<ChatScreen> {
  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: buildChatBar(),
       body: SafeArea(child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          buildChatBar(),
           Expanded(child:
             buildChatArea()
           ),

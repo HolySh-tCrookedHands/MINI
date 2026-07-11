@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mini/screens/auth/controlSing.dart';
-import 'package:mini/screens/main/chat.dart';
 import 'package:mini/screens/main/index.dart';
 import 'package:mini/utils/provider/settings.dart';
 import 'package:provider/provider.dart';
@@ -46,7 +45,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      home: isSingIn == false ? SingUpInScreen() : ChatScreen(),
+      home: isSingIn == false ? SingUpInScreen() : IndexScreen(),
     );
   }
 }

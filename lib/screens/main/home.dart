@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini/models/chatItemModel.dart';
+import 'package:mini/screens/main/chat.dart';
 import 'package:mini/widgets/chatItems.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -51,7 +52,13 @@ class HomeScreenState extends State<HomeScreen> {
           title: chat.title,
           urlAvatar: chat.urlAvatar,
           isOnline: chat.isOnline,
-          callback: () {print(chat.id);}
+          callback: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ChatScreen(data: chat,)
+              )
+            );
+          }
         );
       },
     );
