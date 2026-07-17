@@ -1,5 +1,7 @@
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:mini/models/chatItemModel.dart';
+import 'package:mini/models/msgModel.dart';
 
 class ChatScreen extends StatefulWidget {
   final ChatItemModel data;
@@ -12,21 +14,73 @@ class ChatScreen extends StatefulWidget {
   State<StatefulWidget> createState() => ChatScreenState();
 }
 
-class ChatMessage {
-  final String text;
-  final bool isMe;
-
-  ChatMessage({required this.text, required this.isMe});
-}
-
 class ChatScreenState extends State<ChatScreen> {
 
   late final TextEditingController msgTextController = TextEditingController(); 
+  final FocusNode _focusNode = FocusNode(); // Управляет фокусом клавиатуры
+  
+  bool _isTextFieldEmpty = true;
+  bool _showEmoji = false; // Отвечает за показ панели эмодзи
 
   final List<ChatMessage> _messages = [
-    ChatMessage(text: "Дарова гандон", isMe: true),
-    ChatMessage(text: "Пашол нахуй", isMe: false)
+    ChatMessage(text: "Дарова гандон", isMe: true, time: "12:00", isRead: true),
+    ChatMessage(text: "Пашол нахуй", isMe: false, time: "12:10")
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    msgTextController.addListener(_handleTextChanged);
+    
+    // Если пользователь кликает на поле ввода, закрываем панель эмодзи
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        setState(() {
+          _showEmoji = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    msgTextController.removeListener(_handleTextChanged);
+    msgTextController.dispose();
+    _focusNode.dispose(); // Не забываем очистить фокус-ноду
+    super.dispose();
+  }
+
+  void _onEmojiSelected(Emoji emoji) {
+    final text = msgTextController.text;
+    final selection = msgTextController.selection;
+
+    // Находим позицию курсора
+    final int start = selection.start;
+    final int end = selection.end;
+
+    if (start >= 0) {
+      // Если курсор установлен, вставляем эмодзи прямо в эту позицию
+      final newText = text.replaceRange(start, end, emoji.emoji);
+      msgTextController.text = newText;
+      
+      // Сдвигаем курсор вперед сразу после вставленного эмодзи
+      msgTextController.selection = TextSelection.collapsed(
+        offset: start + emoji.emoji.length,
+      );
+    } else {
+      // Если фокуса на поле нет и курсор не найден, просто добавляем в конец
+      msgTextController.text = text + emoji.emoji;
+    }
+  }
+
+  void _handleTextChanged() {
+    final isEmpty = msgTextController.text.trim().isEmpty;
+    if (_isTextFieldEmpty != isEmpty) {
+      setState(() {
+        _isTextFieldEmpty = isEmpty;
+      });
+    }
+  }
 
   AppBar buildChatBar() {
     final theme = Theme.of(context);
@@ -46,7 +100,7 @@ class ChatScreenState extends State<ChatScreen> {
           ),
           CircleAvatar(
             radius: 20,
-            backgroundImage: NetworkImage(widget.data.urlAvatar), // Или NetworkImage
+            backgroundImage: NetworkImage(widget.data.urlAvatar),
           ),
         ],
       ),
@@ -54,7 +108,7 @@ class ChatScreenState extends State<ChatScreen> {
       actions: [
         IconButton(
           onPressed: () {},
-          icon: Icon(Icons.more_vert)
+          icon: const Icon(Icons.more_vert)
         )
       ],
     );
@@ -83,9 +137,35 @@ class ChatScreenState extends State<ChatScreen> {
             color: color,
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          child: Text(
-            message.text,
-            style: const TextStyle(fontSize: 16, color: Colors.white),
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.end,
+            alignment: WrapAlignment.end,
+            spacing: 10,
+            runSpacing: 4,
+            children: [
+              Text(
+                message.text,
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              ),
+              isMe ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    message.time,
+                    style: const TextStyle(fontSize: 12, color: Colors.white70)
+                  ),
+                  const SizedBox(width: 5),
+                  Icon(
+                    message.isRead ? Icons.done_all : Icons.done,
+                    size: 16,
+                    color: Colors.white70,
+                  )
+                ]
+              ) : Text(
+                message.time,
+                style: const TextStyle(fontSize: 12, color: Colors.white70)
+              )
+            ],
           ),
         ),
       ),
@@ -95,7 +175,7 @@ class ChatScreenState extends State<ChatScreen> {
   Widget buildChatArea() {
     return ListView.separated(
       separatorBuilder:(context, index) {
-        return SizedBox(height: 10,);
+        return const SizedBox(height: 10,);
       },
       padding: const EdgeInsets.all(8.0),
       itemCount: _messages.length,
@@ -109,8 +189,20 @@ class ChatScreenState extends State<ChatScreen> {
     final text = msgTextController.text.trim();
     if (text.isEmpty) return;
 
+    // Добавляем ведущий ноль для минут, если они меньше 10 (например, 12:05 вместо 12:5)
+    final now = DateTime.now();
+    final String minutes = now.minute < 10 ? '0${now.minute}' : '${now.minute}';
+    final String formattedTime = '${now.hour}:$minutes';
+
     setState(() {
-      _messages.add(ChatMessage(text: text, isMe: true));
+      _messages.add(
+        ChatMessage(
+          text: text, 
+          isMe: true,
+          time: formattedTime,
+          isRead: false
+        )
+      );
     });
 
     msgTextController.clear();
@@ -121,34 +213,70 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Widget buildMessageSender() {
+    final double maxSenderHeight = MediaQuery.of(context).size.height * 0.7;
+
     return SizedBox(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end, 
           children: [
-            Expanded(
-              child: TextField(
-                controller: msgTextController,
-                decoration: InputDecoration(
-                hintText: "Введите сообщение...",
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            // Кнопка Эмодзи перед полем ввода
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: IconButton(
+                icon: Icon(
+                  _showEmoji ? Icons.keyboard : Icons.emoji_emotions,
+                  size: 28,
+                  color: Colors.grey[700],
                 ),
-                onSubmitted: (_) => sendMessage(),
+                onPressed: () {
+                  if (_showEmoji) {
+                    // Переключаем на клавиатуру
+                    _focusNode.requestFocus();
+                  } else {
+                    // Убираем клавиатуру и показываем эмодзи
+                    _focusNode.unfocus();
+                    setState(() {
+                      _showEmoji = true;
+                    });
+                  }
+                },
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(
-                left: 10, 
-                bottom: 10
-              ), 
-              child:IconButton(
-                onPressed:sendMessage,
-                icon: Icon(
-                  Icons.send , 
-                  size: 30,
+            
+            // Текстовое поле
+            Expanded(
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: maxSenderHeight,
                 ),
-              )
+                child: TextField(
+                  controller: msgTextController,
+                  focusNode: _focusNode, // Привязываем фокус
+                  maxLines: null, 
+                  keyboardType: TextInputType.multiline, 
+                  decoration: const InputDecoration(
+                    hintText: "Введите сообщение...",
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  ),
+                ),
+              ),
+            ),
+            
+            // Кнопка Отправки / Медиа
+            Padding(
+              padding: const EdgeInsets.only(left: 8, bottom: 5), 
+              child: _isTextFieldEmpty 
+                  ? IconButton(
+                      onPressed: addMedia,
+                      icon: const Icon(Icons.attach_file, size: 30),
+                    )
+                  : IconButton(
+                      onPressed: sendMessage,
+                      icon: const Icon(Icons.send, size: 30),
+                    ),
             )
           ],
         ),
@@ -156,23 +284,32 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildChatBar(),
-      body: SafeArea(child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(child:
-            buildChatArea()
-          ),
-          buildMessageSender(),  
-        ],
-      )
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: buildChatArea()
+            ),
+            buildMessageSender(),  
+            
+            // Сама панель эмодзи под полем ввода
+            if (_showEmoji)
+              Container(
+                height: 250, // Высота панели с эмодзи
+                child: Center(
+                  child: EmojiPicker(
+                    onEmojiSelected: (categotriam, emoji) => _onEmojiSelected(emoji),
+                  )
+                ),
+              ),
+          ],
+        ),
       ),
     ); 
   }
 }
-
-
-
