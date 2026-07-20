@@ -2,6 +2,10 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:mini/models/chatItemModel.dart';
 import 'package:mini/models/msgModel.dart';
+import 'package:mini/utils/provider/settings.dart';
+import 'package:mini/widgets/messageBubble.dart';
+import 'dart:io';
+import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
   final ChatItemModel data;
@@ -17,12 +21,13 @@ class ChatScreen extends StatefulWidget {
 class ChatScreenState extends State<ChatScreen> {
 
   late final TextEditingController msgTextController = TextEditingController(); 
-  final FocusNode _focusNode = FocusNode(); // Управляет фокусом клавиатуры
+  final FocusNode _focusNode = FocusNode();
   
   bool _isTextFieldEmpty = true;
-  bool _showEmoji = false; // Отвечает за показ панели эмодзи
+  bool _showEmoji = false;
 
   final List<ChatMessage> _messages = [
+    ChatMessage(text: "Чат создан", isMe: false, time: "...", typeMsg: "system"),
     ChatMessage(text: "Дарова гандон", isMe: true, time: "12:00", isRead: true),
     ChatMessage(text: "Пашол нахуй", isMe: false, time: "12:10")
   ];
@@ -46,7 +51,7 @@ class ChatScreenState extends State<ChatScreen> {
   void dispose() {
     msgTextController.removeListener(_handleTextChanged);
     msgTextController.dispose();
-    _focusNode.dispose(); // Не забываем очистить фокус-ноду
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -59,16 +64,13 @@ class ChatScreenState extends State<ChatScreen> {
     final int end = selection.end;
 
     if (start >= 0) {
-      // Если курсор установлен, вставляем эмодзи прямо в эту позицию
       final newText = text.replaceRange(start, end, emoji.emoji);
       msgTextController.text = newText;
       
-      // Сдвигаем курсор вперед сразу после вставленного эмодзи
       msgTextController.selection = TextSelection.collapsed(
         offset: start + emoji.emoji.length,
       );
     } else {
-      // Если фокуса на поле нет и курсор не найден, просто добавляем в конец
       msgTextController.text = text + emoji.emoji;
     }
   }
@@ -114,63 +116,6 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
  
-  Widget buildMessageBubble(ChatMessage message) {
-    final isMe = message.isMe;
-
-    final align = isMe
-      ? Alignment.bottomRight
-      : Alignment.bottomLeft;
-
-    final color = isMe
-      ? const Color.fromARGB(255, 67, 98, 43)
-      : const Color.fromARGB(255, 108, 111, 107);
-
-    return Align(
-      alignment: align,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: const BorderRadius.all(Radius.circular(12)),
-          ),
-          child: Wrap(
-            crossAxisAlignment: WrapCrossAlignment.end,
-            alignment: WrapAlignment.end,
-            spacing: 10,
-            runSpacing: 4,
-            children: [
-              Text(
-                message.text,
-                style: const TextStyle(fontSize: 16, color: Colors.white),
-              ),
-              isMe ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    message.time,
-                    style: const TextStyle(fontSize: 12, color: Colors.white70)
-                  ),
-                  const SizedBox(width: 5),
-                  Icon(
-                    message.isRead ? Icons.done_all : Icons.done,
-                    size: 16,
-                    color: Colors.white70,
-                  )
-                ]
-              ) : Text(
-                message.time,
-                style: const TextStyle(fontSize: 12, color: Colors.white70)
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget buildChatArea() {
     return ListView.separated(
@@ -180,7 +125,13 @@ class ChatScreenState extends State<ChatScreen> {
       padding: const EdgeInsets.all(8.0),
       itemCount: _messages.length,
       itemBuilder: (context, index) {
-        return buildMessageBubble(_messages[index]);
+        final data = _messages[index];
+        if (data.typeMsg == "user") {
+          return MsgBubble(data:data);
+        } else if (data.typeMsg == "system") {
+          return MsgBubbleSystem(content: data);
+        }
+          
       },
     );
   }
@@ -189,7 +140,6 @@ class ChatScreenState extends State<ChatScreen> {
     final text = msgTextController.text.trim();
     if (text.isEmpty) return;
 
-    // Добавляем ведущий ноль для минут, если они меньше 10 (например, 12:05 вместо 12:5)
     final now = DateTime.now();
     final String minutes = now.minute < 10 ? '0${now.minute}' : '${now.minute}';
     final String formattedTime = '${now.hour}:$minutes';
@@ -221,7 +171,6 @@ class ChatScreenState extends State<ChatScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end, 
           children: [
-            // Кнопка Эмодзи перед полем ввода
             Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: IconButton(
@@ -245,7 +194,6 @@ class ChatScreenState extends State<ChatScreen> {
               ),
             ),
             
-            // Текстовое поле
             Expanded(
               child: Container(
                 constraints: BoxConstraints(
@@ -253,7 +201,7 @@ class ChatScreenState extends State<ChatScreen> {
                 ),
                 child: TextField(
                   controller: msgTextController,
-                  focusNode: _focusNode, // Привязываем фокус
+                  focusNode: _focusNode,
                   maxLines: null, 
                   keyboardType: TextInputType.multiline, 
                   decoration: const InputDecoration(
@@ -286,6 +234,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<SettingsProvider>();
     return Scaffold(
       appBar: buildChatBar(),
       body: SafeArea(
@@ -293,19 +242,43 @@ class ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: buildChatArea()
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: () {
+                      final path = settings.wallpaperPath;
+                      if (path == null || path.isEmpty) {
+                        return Container(
+                          color: Colors.grey[900],
+                          child: const Center(child: Text('Обои не заданы')),
+                        );
+                      }
+                      
+                      return Image.file(
+                        File(path),
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[900],
+                            child: const Center(child: Text('Обои не найдены')),
+                          );
+                        },
+                      );
+                    }(),
+                  ),
+                  buildChatArea()
+                ],
+              )
             ),
             buildMessageSender(),  
             
-            // Сама панель эмодзи под полем ввода
             if (_showEmoji)
-              Container(
-                height: 250, // Высота панели с эмодзи
-                child: Center(
-                  child: EmojiPicker(
-                    onEmojiSelected: (categotriam, emoji) => _onEmojiSelected(emoji),
-                  )
-                ),
+              Center(
+                child: EmojiPicker(
+                  onEmojiSelected: (categotriam, emoji) => _onEmojiSelected(emoji),
+                )
               ),
           ],
         ),
