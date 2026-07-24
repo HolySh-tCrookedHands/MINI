@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mini/models/chatItemModel.dart';
+import 'package:mini/screens/main/chat.dart';
 import 'package:mini/widgets/chatItems.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,7 +17,11 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    data = [
+    data = GetChatList();
+  }
+
+  List<ChatItemModel> GetChatList() {
+    return [
       ChatItemModel(
         id:0,
         title: "Артём", 
@@ -37,10 +42,6 @@ class HomeScreenState extends State<HomeScreen> {
       ),
     ];
   }
-
-  void GetChatList() {
-    // TODO: написать функцию запроса списка чатов к бэкенду
-  }
   
   Widget buildListChat() {
     return ListView.builder(
@@ -51,7 +52,13 @@ class HomeScreenState extends State<HomeScreen> {
           title: chat.title,
           urlAvatar: chat.urlAvatar,
           isOnline: chat.isOnline,
-          callback: () {print(chat.id);}
+          callback: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ChatScreen(data: chat,)
+              )
+            );
+          }
         );
       },
     );
